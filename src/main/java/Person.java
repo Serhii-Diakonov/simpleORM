@@ -1,21 +1,45 @@
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDate;
 
 public class Person {
     private String name;
-    private String surname;
-    private LocalDate birth;
+//    private String surname;
+
+    private LocalDate dateOfBirth;
+    private int age;
     private String position;
     private double salary;
+    private Float xxx;
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public Float getXxx() {
+        return xxx;
+    }
+
+    public void setXxx(Float xxx) {
+        this.xxx = xxx;
+    }
 
     public Person() {
     }
 
-    public Person(String name, String surname, LocalDate birth, String position, double salary) {
+    public Person(String name, LocalDate birth, int age, String position, double salary, Float xxx) {
         this.name = name;
-        this.surname = surname;
-        this.birth = birth;
+        this.dateOfBirth = birth;
+        this.age = age;
         this.position = position;
         this.salary = salary;
+        this.xxx = xxx;
     }
 
     public String getName() {
@@ -26,20 +50,20 @@ public class Person {
         this.name = name;
     }
 
-    public String getSurname() {
+    /*public String getSurname() {
         return surname;
     }
 
     public void setSurname(String surname) {
         this.surname = surname;
     }
-
-    public LocalDate getBirth() {
-        return birth;
+*/
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
     }
 
-    public void setBirth(LocalDate birth) {
-        this.birth = birth;
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public String getPosition() {
@@ -62,10 +86,11 @@ public class Person {
     public String toString() {
         return "Person{" +
                 "name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
-                ", birth=" + birth +
+                ", birth=" + dateOfBirth +
+                ", age=" + age +
                 ", position='" + position + '\'' +
                 ", salary=" + salary +
+                ", xxx=" + xxx +
                 '}';
     }
 }
