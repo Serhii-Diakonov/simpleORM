@@ -1,4 +1,4 @@
 # simpleORM
-Implementation of a simple ORM
+Implementation of a simple com.knubisoft.ORM
 
-This project is an attempt to implement my own simple ORM. Development is in progress.
+This project is an attempt to implement my own simple com.knubisoft.ORM. Development is in progress.

@@ -1,17 +1,20 @@
+package com.knubisoft.parsingStrategy.impl;
+
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.knubisoft.rwsource.impl.FileReadWriteSource;
+import com.knubisoft.entity.Table;
+import com.knubisoft.parsingStrategy.ParsingStrategy;
 import lombok.SneakyThrows;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class XMLParsingStrategy implements ParsingStrategy<ORMInterface.StringInputSource> {
+public class XMLParsingStrategy implements ParsingStrategy<FileReadWriteSource> {
     @SneakyThrows
     @Override
-    public Table parseToTable(ORMInterface.StringInputSource content) {
+    public Table parseToTable(FileReadWriteSource content) {
         XmlMapper mapper = new XmlMapper();
         JsonNode tree = mapper.readTree(content.getContent());
         Map<Integer, Map<String, String>> res = buildTable(tree);

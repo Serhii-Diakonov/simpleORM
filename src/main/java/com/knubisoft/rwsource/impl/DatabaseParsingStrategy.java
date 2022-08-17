@@ -1,3 +1,8 @@
+package com.knubisoft.rwsource.impl;
+
+import com.knubisoft.entity.Table;
+import com.knubisoft.parsingStrategy.ParsingStrategy;
+import com.knubisoft.rwsource.impl.ConnectionReadWriteSource;
 import lombok.SneakyThrows;
 
 import java.sql.ResultSet;
@@ -5,11 +10,11 @@ import java.sql.ResultSetMetaData;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-class DatabaseParsingStrategy implements ParsingStrategy<ORMInterface.DatabaseInputSource> {
+public class DatabaseParsingStrategy implements ParsingStrategy<ConnectionReadWriteSource> {
 
     @Override
-    public Table parseToTable(ORMInterface.DatabaseInputSource content) {
-        ResultSet rs = content.getResultSet();
+    public Table parseToTable(ConnectionReadWriteSource content) {
+        ResultSet rs = content.getContent();
         Map<Integer, Map<String, String>> result = buildTable(rs);
         return new Table(result);
     }

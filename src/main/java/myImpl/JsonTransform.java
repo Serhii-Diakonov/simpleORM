@@ -23,7 +23,7 @@ public class JsonTransform implements TransformStrategy {
             //Manual parsing
             ArrayNode root = (ArrayNode) mapper.readTree(new File(fileName));
             for (int i = 0; i < root.size(); i++) {
-                personList.add(new Person(root.get(i).get("name").asText(),
+                personList.add(new com.knubisoft.entity.Person(root.get(i).get("name").asText(),
                         LocalDate.parse(root.get(i).get("dateOfBirth").asText()),
                         root.get(i).get("age").asInt(),
                         root.get(i).get("position").asText(),

@@ -1,47 +1,33 @@
-import lombok.SneakyThrows;
-import myImpl.FileContentType;
+package com.knubisoft;
 
-import java.io.*;
+import com.knubisoft.entity.Table;
+import com.knubisoft.parsingStrategy.ParsingStrategy;
+import com.knubisoft.parsingStrategy.impl.CSVParsingStrategy;
+import com.knubisoft.parsingStrategy.impl.JSONParsingStrategy;
+import com.knubisoft.parsingStrategy.impl.XMLParsingStrategy;
+import com.knubisoft.rwsource.impl.ConnectionReadWriteSource;
+import com.knubisoft.rwsource.DataReadWriteSource;
+import com.knubisoft.rwsource.impl.DatabaseParsingStrategy;
+import com.knubisoft.rwsource.impl.FileReadWriteSource;
+import lombok.SneakyThrows;
+
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 public class ORM implements ORMInterface {
 
     @Override
     @SneakyThrows
-    public <T> List<T> transform(DataInputSource inputSource, Class<T> cls) {
-        Table table = convertToTable(inputSource);
+    public <T> List<T> readAll(DataReadWriteSource<?> source, Class<T> cls) {
+        Table table = convertToTable(source);
         return convertTableToListOfClasses(table, cls);
-    }
-
-    private Table convertToTable(DataInputSource dataInputSource) {
-        if (dataInputSource instanceof DatabaseInputSource) {
-            return new DatabaseParsingStrategy().
-                    parseToTable((DatabaseInputSource) dataInputSource);
-        } else if (dataInputSource instanceof StringInputSource) {
-            return getStringParsingStrategy((StringInputSource) dataInputSource).
-                    parseToTable((StringInputSource) dataInputSource);
-        } else {
-            throw new UnsupportedOperationException("Unknown DataInputSource " + dataInputSource);
-        }
-    }
-
-    private ParsingStrategy<StringInputSource> getStringParsingStrategy(StringInputSource inputSource) {
-        String content = inputSource.getContent();
-        char firstChar = content.charAt(0);
-        switch (firstChar) {
-            case '{':
-            case '[':
-                return new JSONParsingStrategy();
-            case '<':
-                return new XMLParsingStrategy();
-            default:
-                return new CSVParsingStrategy();
-        }
     }
 
     private <T> List<T> convertTableToListOfClasses(Table table, Class<T> cls) {
@@ -67,7 +53,7 @@ public class ORM implements ORMInterface {
         return instance;
     }
 
-    private static Object transformValueToFieldType(Field field, String value) {
+    private Object transformValueToFieldType(Field field, String value) {
         Map<Class<?>, Function<String, Object>> typeToFunction = new LinkedHashMap<>();
         typeToFunction.put(String.class, s -> s);
         typeToFunction.put(int.class, Integer::parseInt);
@@ -87,29 +73,29 @@ public class ORM implements ORMInterface {
         }).apply(value);
     }
 
-    private ParsingStrategy createStrategyByFileContentType(FileContentType FileContentType) {
-        switch (FileContentType) {
-            case JSON:
-                return new JSONParsingStrategy();
-            case XML:
-                return new XMLParsingStrategy();
-            case CSV:
-                return new CSVParsingStrategy();
-            default:
-                throw new UnsupportedOperationException("Unknown strategy " + FileContentType);
+    private Table convertToTable(DataReadWriteSource dataInputSource) {
+        if (dataInputSource instanceof ConnectionReadWriteSource) {
+            ConnectionReadWriteSource dbSrc = ((ConnectionReadWriteSource) dataInputSource);
+            return new DatabaseParsingStrategy().parseToTable(dbSrc);
+        } else if (dataInputSource instanceof FileReadWriteSource) {
+            FileReadWriteSource fileSrc = ((FileReadWriteSource) dataInputSource);
+            return getStringParsingStrategy(fileSrc).parseToTable(fileSrc);
+        } else {
+            throw new UnsupportedOperationException("Unknown DataInputSource " + dataInputSource);
         }
     }
 
-    private FileContentType guessFileContentTypeByContent(String content) {
+    private ParsingStrategy<FileReadWriteSource> getStringParsingStrategy(FileReadWriteSource inputSource) {
+        String content = inputSource.getContent();
         char firstChar = content.charAt(0);
         switch (firstChar) {
             case '{':
             case '[':
-                return FileContentType.JSON;
+                return new JSONParsingStrategy();
             case '<':
-                return FileContentType.XML;
+                return new XMLParsingStrategy();
             default:
-                return FileContentType.CSV;
+                return new CSVParsingStrategy();
         }
     }
 }
