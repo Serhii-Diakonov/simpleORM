@@ -1,3 +1,3 @@
-interface ParsingStrategy {
-    Table parseToTable(String content);
+interface ParsingStrategy<T extends ORMInterface.DataInputSource> {
+    Table parseToTable(T content);
 }

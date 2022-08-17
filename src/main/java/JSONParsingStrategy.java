@@ -6,13 +6,13 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class JSONParsingStrategy implements ParsingStrategy {
+public class JSONParsingStrategy implements ParsingStrategy<ORMInterface.StringInputSource> {
 
     @SneakyThrows
     @Override
-    public Table parseToTable(String content) {
+    public Table parseToTable(ORMInterface.StringInputSource content) {
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode tree = mapper.readTree(content);
+        JsonNode tree = mapper.readTree(content.getContent());
         Map<Integer, Map<String, String>> result = buildTable(tree);
         return new Table(result);
     }

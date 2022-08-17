@@ -3,14 +3,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CSVParsingStrategy implements ParsingStrategy {
+public class CSVParsingStrategy implements ParsingStrategy<ORMInterface.StringInputSource> {
 
     public static final String DELIMITER = ",";
     public static final String COMMENT = "--";
 
     @Override
-    public Table parseToTable(String content) {
-        List<String> lines = Arrays.asList(content.split(System.lineSeparator()));
+    public Table parseToTable(ORMInterface.StringInputSource content) {
+        List<String> lines = Arrays.asList(content.getContent().split(System.lineSeparator()));
         Map<Integer, String> mapping = buildMapping(lines.get(0));
         Map<Integer, Map<String, String>> result = buildTable(lines.subList(1, lines.size()), mapping);
         return new Table(result);

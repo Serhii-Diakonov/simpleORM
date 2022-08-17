@@ -13,8 +13,25 @@ public class Main {
         URL urlCSV = Main.class.getClassLoader().getResource("sample.csv");
         URL urlXML = Main.class.getClassLoader().getResource("sample.xml");
 
-        List<Person> resultJSON = new ORM().transform(new File(urlJSON.toURI()), Person.class);
-        List<Person> resultCSV = new ORM().transform(new File(urlCSV.toURI()), Person.class);
-        List<Person> resultXML = new ORM().transform(new File(urlXML.toURI()), Person.class);
+        ORMInterface _interface = new ORM();
+
+        List<Person> resultJSON = _interface.transform(new ORMInterface.StringInputSource(readFileToString(new File(urlJSON.toURI()))), Person.class);
+        List<Person> resultCSV = _interface.transform(new ORMInterface.StringInputSource(readFileToString(new File(urlCSV.toURI()))), Person.class);
+        List<Person> resultXML = _interface.transform(new ORMInterface.StringInputSource(readFileToString(new File(urlXML.toURI()))), Person.class);
+    }
+
+    private static String readFileToString(File file) {
+        StringBuilder fileContent = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String buffer;
+            while ((buffer = reader.readLine()) != null) {
+                fileContent.append(buffer).append(System.lineSeparator());
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return fileContent.toString();
     }
 }

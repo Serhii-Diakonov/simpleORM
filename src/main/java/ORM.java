@@ -9,29 +9,39 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 
-public class ORM {
-    private String readFileToString(File file) {
-        StringBuilder fileContent = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String buffer;
-            while ((buffer = reader.readLine()) != null) {
-                fileContent.append(buffer).append(System.lineSeparator());
-            }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return fileContent.toString();
-    }
-    @SneakyThrows
-    public <T> List<T> transform(File file, Class<T> cls) {
-        String content = readFileToString(file);
-        FileContentType FileContentType = guessFileContentTypeByContent(content);
-        ParsingStrategy parsingStrategy = createStrategyByFileContentType(FileContentType);
+public class ORM implements ORMInterface {
 
-        Table table = parsingStrategy.parseToTable(content);
+    @Override
+    @SneakyThrows
+    public <T> List<T> transform(DataInputSource inputSource, Class<T> cls) {
+        Table table = convertToTable(inputSource);
         return convertTableToListOfClasses(table, cls);
+    }
+
+    private Table convertToTable(DataInputSource dataInputSource) {
+        if (dataInputSource instanceof DatabaseInputSource) {
+            return new DatabaseParsingStrategy().
+                    parseToTable((DatabaseInputSource) dataInputSource);
+        } else if (dataInputSource instanceof StringInputSource) {
+            return getStringParsingStrategy((StringInputSource) dataInputSource).
+                    parseToTable((StringInputSource) dataInputSource);
+        } else {
+            throw new UnsupportedOperationException("Unknown DataInputSource " + dataInputSource);
+        }
+    }
+
+    private ParsingStrategy<StringInputSource> getStringParsingStrategy(StringInputSource inputSource) {
+        String content = inputSource.getContent();
+        char firstChar = content.charAt(0);
+        switch (firstChar) {
+            case '{':
+            case '[':
+                return new JSONParsingStrategy();
+            case '<':
+                return new XMLParsingStrategy();
+            default:
+                return new CSVParsingStrategy();
+        }
     }
 
     private <T> List<T> convertTableToListOfClasses(Table table, Class<T> cls) {
