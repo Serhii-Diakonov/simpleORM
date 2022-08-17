@@ -42,11 +42,11 @@ public class Main {
     private static void withConnection(Function<Connection, Void> function) throws SQLException {
         try (Connection c = DriverManager.getConnection("jdbc:sqlite:sample.db")) {
             try (Statement stmt = c.createStatement()) {
-                stmt.executeUpdate("CREATE TABLE IF NOT EXIST person" +
+                stmt.executeUpdate("CREATE TABLE IF NOT EXISTS person" +
                         "(id INTEGER not null," +
-                        "name varchar(255)" +
-                        "position varchar(255)" +
-                        "age integer" +
+                        "name varchar(255)," +
+                        "position varchar(255)," +
+                        "age integer," +
                         "primary key (id))");
 
                 stmt.executeUpdate("DELETE from person");
