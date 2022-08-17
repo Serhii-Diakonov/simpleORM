@@ -8,13 +8,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Person {
+public class Person2 {
 
     private String name;
     private BigInteger age;
-    private BigInteger salary;
-    private String position;
-    private LocalDate dateOfBirth;
-    private Float xxx;
 
 }

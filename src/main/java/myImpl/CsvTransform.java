@@ -1,3 +1,7 @@
+package myImpl;
+
+import myImpl.TransformStrategy;
+
 import java.io.*;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
@@ -16,13 +20,13 @@ public class CsvTransform implements TransformStrategy {
 
     @Override
     public <T> List<T> transform(File file, Class<T> cls) {
-        List<String> lines = processFile(file);
+        List<String> lines = readFile(file);
         Map<Integer, String> mapping = buildMapping(lines.get(0));
 
         return lines.subList(1, lines.size()).stream().map(line -> toType(line, cls, mapping)).collect(Collectors.toList());
     }
 
-    private static Map<Integer, String> buildMapping(String headerLine) {
+    private Map<Integer, String> buildMapping(String headerLine) {
         Map<Integer, String> map = new LinkedHashMap<>();
         String[] columnNames = headerLine.split(CSV_DELIMITER);
         for (int i = 0; i < columnNames.length; i++) {
@@ -35,11 +39,12 @@ public class CsvTransform implements TransformStrategy {
         return map;
     }
 
-    private static <T> T toType(String line, Class<T> cls, Map<Integer, String> mapping) {
+    private <T> T toType(String line, Class<T> cls, Map<Integer, String> mapping) {
         T type = null;
         try {
             type = cls.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
         String[] array = line.split(CSV_DELIMITER);
@@ -51,7 +56,7 @@ public class CsvTransform implements TransformStrategy {
         return type;
     }
 
-    private static void setValueIntoFieldOrThrow(String val, String fieldName, Object type) {
+    private void setValueIntoFieldOrThrow(String val, String fieldName, Object type) {
         try {
             Field field = null;
             for (Field f : type.getClass().getDeclaredFields()) {
@@ -67,7 +72,7 @@ public class CsvTransform implements TransformStrategy {
         }
     }
 
-    private static Object transformValueToFieldType(Field field, String val) {
+    private Object transformValueToFieldType(Field field, String val) {
         Map<Class<?>, Function<String, Object>> typeToFunction = new LinkedHashMap<>();
         typeToFunction.put(String.class, s -> s);
         typeToFunction.put(int.class, Integer::parseInt);
@@ -83,7 +88,7 @@ public class CsvTransform implements TransformStrategy {
         }).apply(val);
     }
 
-    private static List<String> processFile(File file) {
+    private List<String> readFile(File file) {
         List<String> fileContent = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String buffer;
@@ -96,4 +101,5 @@ public class CsvTransform implements TransformStrategy {
             throw new RuntimeException(e);
         }
         return fileContent;
-    }}
+    }
+}

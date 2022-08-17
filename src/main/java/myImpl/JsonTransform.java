@@ -1,19 +1,24 @@
+package myImpl;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import myImpl.TransformStrategy;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class JsonTransform implements TransformStrategy{
+
+public class JsonTransform implements TransformStrategy {
     @Override
     public <T> List<T> transform(File file, Class<T> cls) {
-        List<T> personList;
+        List<T> objectList;
         ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
         try {
-            ObjectReader objectReader = mapper.readerForListOf(Person.class);
-            personList = objectReader.readValue(file);
+            ObjectReader objectReader = mapper.readerForListOf(cls);
+            objectList = objectReader.readValue(file);
+
             /*
             //Manual parsing
             ArrayNode root = (ArrayNode) mapper.readTree(new File(fileName));
@@ -30,6 +35,6 @@ public class JsonTransform implements TransformStrategy{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return personList;
+        return objectList;
     }
 }
