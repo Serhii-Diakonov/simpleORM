@@ -1,5 +1,6 @@
 package com.knubisoft;
 
+import com.knubisoft.anno.TableAnno;
 import com.knubisoft.entity.Table;
 import com.knubisoft.parsingStrategy.ParsingStrategy;
 import com.knubisoft.parsingStrategy.impl.CSVParsingStrategy;
@@ -7,7 +8,7 @@ import com.knubisoft.parsingStrategy.impl.JSONParsingStrategy;
 import com.knubisoft.parsingStrategy.impl.XMLParsingStrategy;
 import com.knubisoft.rwsource.impl.ConnectionReadWriteSource;
 import com.knubisoft.rwsource.DataReadWriteSource;
-import com.knubisoft.rwsource.impl.DatabaseParsingStrategy;
+import com.knubisoft.parsingStrategy.impl.DatabaseParsingStrategy;
 import com.knubisoft.rwsource.impl.FileReadWriteSource;
 import lombok.SneakyThrows;
 
@@ -26,7 +27,7 @@ public class ORM implements ORMInterface {
     @Override
     @SneakyThrows
     public <T> List<T> readAll(DataReadWriteSource<?> source, Class<T> cls) {
-        Table table = convertToTable(source);
+        Table table = convertToTable(source, cls);
         return convertTableToListOfClasses(table, cls);
     }
 
@@ -73,10 +74,10 @@ public class ORM implements ORMInterface {
         }).apply(value);
     }
 
-    private Table convertToTable(DataReadWriteSource dataInputSource) {
+    private Table convertToTable(DataReadWriteSource dataInputSource, Class<?> cls) {
         if (dataInputSource instanceof ConnectionReadWriteSource) {
             ConnectionReadWriteSource dbSrc = ((ConnectionReadWriteSource) dataInputSource);
-            return new DatabaseParsingStrategy().parseToTable(dbSrc);
+            return new DatabaseParsingStrategy(cls).parseToTable(dbSrc);
         } else if (dataInputSource instanceof FileReadWriteSource) {
             FileReadWriteSource fileSrc = ((FileReadWriteSource) dataInputSource);
             return getStringParsingStrategy(fileSrc).parseToTable(fileSrc);
