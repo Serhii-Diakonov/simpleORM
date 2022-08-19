@@ -1,17 +1,21 @@
 package com.knubisoft;
 
-import com.knubisoft.anno.TableAnno;
 import com.knubisoft.entity.Table;
 import com.knubisoft.parsingStrategy.ParsingStrategy;
 import com.knubisoft.parsingStrategy.impl.CSVParsingStrategy;
+import com.knubisoft.parsingStrategy.impl.DatabaseParsingStrategy;
 import com.knubisoft.parsingStrategy.impl.JSONParsingStrategy;
 import com.knubisoft.parsingStrategy.impl.XMLParsingStrategy;
-import com.knubisoft.rwsource.impl.ConnectionReadWriteSource;
 import com.knubisoft.rwsource.DataReadWriteSource;
-import com.knubisoft.parsingStrategy.impl.DatabaseParsingStrategy;
+import com.knubisoft.rwsource.impl.ConnectionReadWriteSource;
 import com.knubisoft.rwsource.impl.FileReadWriteSource;
+import com.knubisoft.writingStrategy.WritingStrategy;
+import com.knubisoft.writingStrategy.impl.CSVWriter;
+import com.knubisoft.writingStrategy.impl.JSONWriter;
+import com.knubisoft.writingStrategy.impl.XMLWriter;
 import lombok.SneakyThrows;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -23,12 +27,33 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class ORM implements ORMInterface {
-
     @Override
     @SneakyThrows
     public <T> List<T> readAll(DataReadWriteSource<?> source, Class<T> cls) {
         Table table = convertToTable(source, cls);
         return convertTableToListOfClasses(table, cls);
+    }
+
+    @Override
+    public <T> void writeAll(DataReadWriteSource<?> content, List<T> objects) {
+        if (content instanceof FileReadWriteSource) {
+            File file = ((FileReadWriteSource) content).getSource();
+            WritingStrategy writingStrategy = getWritingStrategyForFile(file.getName());
+            writingStrategy.writeTo(file, objects);
+        }
+    }
+
+    private WritingStrategy getWritingStrategyForFile(String fileName) {
+        WritingStrategy writingStrategy;
+        if (fileName.endsWith(".xml")) {
+            writingStrategy = new XMLWriter();
+        } else if (fileName.endsWith(".json")) {
+            writingStrategy = new JSONWriter();
+        } else if (fileName.endsWith(".csv")) {
+            writingStrategy = new CSVWriter();
+        } else throw new UnsupportedOperationException("Unknown file format '" +
+                fileName.split("\\.")[1] + "'");
+        return writingStrategy;
     }
 
     private <T> List<T> convertTableToListOfClasses(Table table, Class<T> cls) {
@@ -54,6 +79,7 @@ public class ORM implements ORMInterface {
         return instance;
     }
 
+
     private Object transformValueToFieldType(Field field, String value) {
         Map<Class<?>, Function<String, Object>> typeToFunction = new LinkedHashMap<>();
         typeToFunction.put(String.class, s -> s);
@@ -74,12 +100,10 @@ public class ORM implements ORMInterface {
         }).apply(value);
     }
 
-    private Table convertToTable(DataReadWriteSource dataInputSource, Class<?> cls) {
-        if (dataInputSource instanceof ConnectionReadWriteSource) {
-            ConnectionReadWriteSource dbSrc = ((ConnectionReadWriteSource) dataInputSource);
+    private Table convertToTable(DataReadWriteSource<?> dataInputSource, Class<?> cls) {
+        if (dataInputSource instanceof ConnectionReadWriteSource dbSrc) {
             return new DatabaseParsingStrategy(cls).parseToTable(dbSrc);
-        } else if (dataInputSource instanceof FileReadWriteSource) {
-            FileReadWriteSource fileSrc = ((FileReadWriteSource) dataInputSource);
+        } else if (dataInputSource instanceof FileReadWriteSource fileSrc) {
             return getStringParsingStrategy(fileSrc).parseToTable(fileSrc);
         } else {
             throw new UnsupportedOperationException("Unknown DataInputSource " + dataInputSource);
@@ -89,14 +113,10 @@ public class ORM implements ORMInterface {
     private ParsingStrategy<FileReadWriteSource> getStringParsingStrategy(FileReadWriteSource inputSource) {
         String content = inputSource.getContent();
         char firstChar = content.charAt(0);
-        switch (firstChar) {
-            case '{':
-            case '[':
-                return new JSONParsingStrategy();
-            case '<':
-                return new XMLParsingStrategy();
-            default:
-                return new CSVParsingStrategy();
-        }
+        return switch (firstChar) {
+            case '{', '[' -> new JSONParsingStrategy();
+            case '<' -> new XMLParsingStrategy();
+            default -> new CSVParsingStrategy();
+        };
     }
 }

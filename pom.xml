@@ -10,6 +10,20 @@
 
     <dependencies>
 
+        <!--	Parameter names	-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-parameter-names</artifactId>
+            <version>2.13.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.csveed</groupId>
+            <artifactId>csveed</artifactId>
+            <version>0.7.3</version>
+        </dependency>
+
+
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

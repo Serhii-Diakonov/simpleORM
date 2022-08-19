@@ -1,0 +1,50 @@
+[ {
+  "name" : "Ivan",
+  "age" : 19,
+  "salary" : 1000,
+  "position" : "junior",
+  "dateOfBirth" : "19.10.1995",
+  "xxx" : 1234.123
+}, {
+  "name" : "Olga",
+  "age" : 20,
+  "salary" : 100,
+  "position" : "senior",
+  "dateOfBirth" : "20.10.1993",
+  "xxx" : 1234.123
+}, {
+  "name" : "Misha",
+  "age" : 21,
+  "salary" : 3000,
+  "position" : "senior",
+  "dateOfBirth" : "23.10.1987",
+  "xxx" : 1234.123
+}, {
+  "name" : "Petiya",
+  "age" : 22,
+  "salary" : 5000,
+  "position" : "junior",
+  "dateOfBirth" : "19.09.1988",
+  "xxx" : 1234.123
+}, {
+  "name" : "Sonia",
+  "age" : 23,
+  "salary" : 4000,
+  "position" : "middle",
+  "dateOfBirth" : "18.08.1989",
+  "xxx" : 1234.123
+}, {
+  "name" : "Kolya",
+  "age" : 24,
+  "salary" : 3000,
+  "position" : "middle",
+  "dateOfBirth" : "17.08.1991",
+  "xxx" : 1234.123
+}, {
+  "name" : "BILLY",
+  "age" : 1,
+  "salary" : 10,
+  "position" : "CEO",
+  "dateOfBirth" : "19.08.2022",
+  "xxx" : 0.0
+} ]
