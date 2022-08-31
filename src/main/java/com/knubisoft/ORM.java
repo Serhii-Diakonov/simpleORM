@@ -104,19 +104,22 @@ public class ORM implements ORMInterface {
         if (dataInputSource instanceof ConnectionReadWriteSource dbSrc) {
             return new DatabaseParsingStrategy(cls).parseToTable(dbSrc);
         } else if (dataInputSource instanceof FileReadWriteSource fileSrc) {
-            return getStringParsingStrategy(fileSrc).parseToTable(fileSrc);
+            return getStringParsingStrategy(fileSrc, cls).parseToTable(fileSrc);
         } else {
             throw new UnsupportedOperationException("Unknown DataInputSource " + dataInputSource);
         }
     }
 
-    private ParsingStrategy<FileReadWriteSource> getStringParsingStrategy(FileReadWriteSource inputSource) {
+    private ParsingStrategy<FileReadWriteSource> getStringParsingStrategy(FileReadWriteSource inputSource, Class<?> cls) {
         String content = inputSource.getContent();
+        if(content.matches("((\\w+([.-]?))+,)+")) return new CSVParsingStrategy();
+
         char firstChar = content.charAt(0);
         return switch (firstChar) {
             case '{', '[' -> new JSONParsingStrategy();
             case '<' -> new XMLParsingStrategy();
-            default -> new CSVParsingStrategy();
+            default ->  new PDFParsingStrategy(cls);
         };
+
     }
 }

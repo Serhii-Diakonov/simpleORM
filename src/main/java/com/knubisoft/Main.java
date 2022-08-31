@@ -57,19 +57,21 @@ public class Main {
 
     @SneakyThrows
     private static void process(Connection connection) {
-        URL url = Main.class.getClassLoader().getResource(CSV_SRC);
+//        URL url = Main.class.getClassLoader().getResource(CSV_SRC);
         ORMInterface orm = new ORM();
-        List<Person> res1;
-        List<Person2> res2;
-
-        res1 = orm.readAll(new FileReadWriteSource(new File(url.toURI())), Person.class);
-        res1.add(new Person("BILLY", BigInteger.ONE, BigInteger.TEN, "CEO", LocalDate.now(), 0f));
-        orm.writeAll(new FileReadWriteSource(new File("src/main/resources/sample_2.csv")), res1);
+//        List<Person> res1;
+//        List<Person2> res2;
+//
+//        res1 = orm.readAll(new FileReadWriteSource(new File(url.toURI())), Person.class);
+//        res1.add(new Person("BILLY", BigInteger.ONE, BigInteger.TEN, "CEO", LocalDate.now(), 0f));
+//        orm.writeAll(new FileReadWriteSource(new File("src/main/resources/sample_2.csv")), res1);
 
 //        DataReadWriteSource<ResultSet> rw = new ConnectionReadWriteSource(connection);
 //        res1 = orm.readAll(rw, Person.class);
 //        res1.add(new Person("BILLY", BigInteger.ONE, BigInteger.TEN, "CEO", LocalDate.now(), 0f));
 //        res2 = orm.readAll(rw, Person2.class);
 //        orm.writeAll(rw, res1);
+
+        orm.readAll(new FileReadWriteSource(new File("src/main/resources/sample.pdf")), RowStructure.class);
     }
 }
