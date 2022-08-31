@@ -11,6 +11,7 @@ import com.knubisoft.rwsource.impl.ConnectionReadWriteSource;
 import com.knubisoft.rwsource.impl.FileReadWriteSource;
 import com.knubisoft.writingStrategy.WritingStrategy;
 import com.knubisoft.writingStrategy.impl.CSVWriter;
+import com.knubisoft.writingStrategy.impl.DBWriter;
 import com.knubisoft.writingStrategy.impl.JSONWriter;
 import com.knubisoft.writingStrategy.impl.XMLWriter;
 import lombok.SneakyThrows;
@@ -36,11 +37,15 @@ public class ORM implements ORMInterface {
 
     @Override
     public <T> void writeAll(DataReadWriteSource<?> content, List<T> objects) {
+        WritingStrategy writingStrategy = null;
         if (content instanceof FileReadWriteSource) {
             File file = ((FileReadWriteSource) content).getSource();
-            WritingStrategy writingStrategy = getWritingStrategyForFile(file.getName());
-            writingStrategy.writeTo(file, objects);
+            writingStrategy = getWritingStrategyForFile(file.getName());
+            writingStrategy.writeTo(content, objects);
+        } else if (content instanceof ConnectionReadWriteSource) {
+            writingStrategy = new DBWriter();
         }
+        writingStrategy.writeTo(content, objects);
     }
 
     private WritingStrategy getWritingStrategyForFile(String fileName) {

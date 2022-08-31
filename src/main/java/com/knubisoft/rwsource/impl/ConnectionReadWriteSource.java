@@ -16,7 +16,7 @@ import java.sql.Statement;
 public class ConnectionReadWriteSource implements DataReadWriteSource<ResultSet> {
 
     private Connection source;
-    private String table;
+    private String tableName;
 
     public ConnectionReadWriteSource(Connection source) {
         this.source = source;
@@ -26,6 +26,10 @@ public class ConnectionReadWriteSource implements DataReadWriteSource<ResultSet>
     @SneakyThrows
     public ResultSet getContent() {
         Statement statement = source.createStatement();
-        return statement.executeQuery("SELECT * FROM " + table);
+        return statement.executeQuery("SELECT * FROM " + tableName);
+    }
+
+    public Connection getSource() {
+        return source;
     }
 }

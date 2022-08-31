@@ -1,5 +1,7 @@
 package com.knubisoft.rwsource;
 
-public interface DataReadWriteSource<ReadType> {
-    ReadType getContent();
+public interface DataReadWriteSource<T> {
+     T getContent();
+
+     Object getSource();
 }

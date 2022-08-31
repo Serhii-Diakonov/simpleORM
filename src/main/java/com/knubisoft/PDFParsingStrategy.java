@@ -36,50 +36,13 @@ public class PDFParsingStrategy implements ParsingStrategy<FileReadWriteSource> 
             while (matcher.find())
                 result.add(getEntity(regex, matcher));
         }
-//            isHeaderMatchFields(buffer, cls);
-//            List<Matcher> matchers = new ArrayList<>();
-//            for (String regex : getRegexList()) {
-//                matchers.add(Pattern.compile(regex).matcher(buffer));
-//            }
-//            Field[] fields = cls.getDeclaredFields();
-//
-//            Map<Integer, String> map = new LinkedHashMap<>();
-//            for (int i = 0; i < fields.length; i++) {
-//                map.put(i, fields[i].getName());
-//            }
-//
-//            Map<Integer, Map<String, String>> result = new LinkedHashMap<>();
-//            while (isAvailableMatchings(matchers)) {
-//                for (int i = 0; i < fields.length; i++) {
-//                    Map<String, String > hashMap = new LinkedHashMap<>();
-//                    hashMap.put(fields[i].getName(), matchers.get(i).group());
-//                    result.put(i, hashMap);
-//                }
-//            }
-//
-//            Table t = new Table(result);
-
-
-//            List<Type> types = new ArrayList<>();
-//            for (Field field : fields) {
-//                types.add(field.getType());
-//            }
-//            Type[] t = new Type[types.size()];
-
-
-//            for (Field declaredField : declaredFields) {
-//                if (declaredField.isAnnotationPresent(Lookup.class)) {
-//                    List<String> column = extractByLookup(buffer, declaredField);
-//                }
-//            }
-
         return null;
     }
 
     private Map<String, String> findFieldNameRegex() {
         Map<String, String> res = new LinkedHashMap<>();
         for (Field field : cls.getDeclaredFields()) {
-            if(field.isAnnotationPresent(Lookup.class)){
+            if (field.isAnnotationPresent(Lookup.class)) {
                 res.put(field.getName(), field.getAnnotation(Lookup.class).regex());
             }
         }
@@ -95,48 +58,5 @@ public class PDFParsingStrategy implements ParsingStrategy<FileReadWriteSource> 
             field.set(instance, matcher.group(s).replaceAll("\\h", " "));
         }
         return instance;
-    }
-
-    private boolean isAvailableMatchings(List<Matcher> matchers) {
-        boolean isFound = true;
-        for (Matcher matcher : matchers) {
-            if (!matcher.find()) {
-                isFound = false;
-                break;
-            }
-        }
-        return isFound;
-    }
-
-    private List<String> getRegexList() {
-        List<String> regexes = new ArrayList<>();
-        for (Field field : cls.getDeclaredFields()) {
-            if (field.isAnnotationPresent(Lookup.class))
-                regexes.add(field.getAnnotation(Lookup.class).regex());
-        }
-        return regexes;
-    }
-
-    private boolean isHeaderMatchFields(String buffer, Class<?> cls) {
-        Field[] declaredFields = cls.getDeclaredFields();
-        StringBuilder regexHeader = new StringBuilder();
-        for (int i = 0; i < declaredFields.length; i++) {
-            regexHeader.append(declaredFields[i]);
-            if (i < declaredFields.length - 1)
-                regexHeader.append("\s");
-        }
-        Pattern pattern = Pattern.compile(regexHeader.toString(), Pattern.CASE_INSENSITIVE);
-        return pattern.matcher(buffer).find();
-    }
-
-    private List<String> extractByLookup(String buffer, Field declaredField) {
-        List<String> matchingStrings = new ArrayList<>();
-        String regex = declaredField.getAnnotation(Lookup.class).regex();
-        Pattern pattern = Pattern.compile(regex);
-        Matcher match = pattern.matcher(buffer);
-        while (match.find()) {
-            matchingStrings.add(match.group());
-        }
-        return matchingStrings;
     }
 }

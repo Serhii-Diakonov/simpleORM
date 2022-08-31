@@ -1,5 +1,7 @@
 package com.knubisoft.writingStrategy.impl;
 
+import com.knubisoft.rwsource.DataReadWriteSource;
+import com.knubisoft.rwsource.impl.FileReadWriteSource;
 import com.knubisoft.writingStrategy.WritingStrategy;
 import lombok.SneakyThrows;
 import org.csveed.api.CsvClientImpl;
@@ -16,7 +18,8 @@ import java.util.List;
 public class CSVWriter implements WritingStrategy {
     @Override
     @SneakyThrows
-    public <T> void writeTo(File file, List<T> objects) {
+    public <T> void writeTo(DataReadWriteSource<?> src, List<T> objects) {
+        File file = ((FileReadWriteSource) src).getSource();
         try (Writer writer = new FileWriter(file)) {
             Class<T> clazz = (Class<T>) objects.get(0).getClass();
             CsvClientImpl<T> csvWriter = new CsvClientImpl<>(writer, clazz);

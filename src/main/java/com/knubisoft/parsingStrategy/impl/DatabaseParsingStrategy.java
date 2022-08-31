@@ -33,7 +33,7 @@ public class DatabaseParsingStrategy implements ParsingStrategy<ConnectionReadWr
             } else {
                 tableName = anno.tableName();
             }
-            src.setTable(tableName);
+            src.setTableName(tableName);
         } else throw new RuntimeException("Cannot find appropriate table for class " + cls.getSimpleName());
     }
 
